@@ -14,10 +14,9 @@ final class LoginViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
     }
     
-    //El sender dictará a que tipo de compoenente se puede conectar esta acción. Se puede colocar la palabra reservada "any" para indicar que cualquier elemento que peuda realizar una accion se pueda conectar a este componente.
+    //El sender dictará a que tipo de componente se puede conectar esta acción. Se puede colocar la palabra reservada "any" para indicar que cualquier elemento que peuda realizar una accion se pueda conectar a este componente.
     @IBAction func loginButtonTapped(_ sender: UIButton){
         print("user: ", userField.text)
         print("password: ", passwordField.text)

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Foundation
 
 class HomeViewController: UIViewController {
 
@@ -15,33 +16,74 @@ class HomeViewController: UIViewController {
     
     @IBOutlet weak var customTextSwitch: UISwitch!
     
-    @IBOutlet weak var customTextField: UITextView!
+    @IBOutlet weak var customTextField: UITextView! {
+        didSet{
+            customTextField.delegate = self
+        }
+    }
+    
+    @IBOutlet weak var picsButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        picsButton.setImage(UIImage(systemName: imageType.isOn ? "dog.fill" : "cat.fill"), for: .normal)
+        customTextField.isEditable = customTextSwitch.isOn
     }
     
-    @IBAction func picsButtonTapped(_ sender: Any) {
-        
-    }
     @IBAction func logOutButtonTapped(_ sender: Any) {
-        
+        self.navigationController?.dismiss(animated: true)
     }
     
     @IBAction func infoButtonTapped(_ sender: Any) {
-        
+        if customTextSwitch.isOn{
+            if customTextField.text != "" {
+                //HomeInformationSegue
+                performSegue(withIdentifier: "HomeInformationSegue", sender: nil)
+            }else{
+                let alertController = UIAlertController(title: nil, message: "Add custom text", preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
+                present(alertController, animated: true)
+            }
+        }else{
+            //Se ejecuta nuestro segue con texto default
+            performSegue(withIdentifier: "HomeInformationSegue", sender: nil)
+        }
     }
     
-    /*
+    @IBAction func imageTypeSwitchValueChanged(_ sender: UISwitch) {
+        picsButton.setImage(UIImage(systemName: imageType.isOn ? "dog.fill" : "cat.fill"), for: .normal)
+    }
+    
+    @IBAction func captionSwitchValueChanged(_ sender: UISwitch) {
+        customTextField.isEditable = sender.isOn
+    }
+    
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+        if let feedViewController = segue.destination as? FeedViewController{
+            feedViewController.pictureType = imageType.isOn ? .dog : .cat
+            feedViewController.showCaption = captionSwitch.isOn
+        }else if segue.identifier == "HomeInformationSegue",
+                 let informationViewController = segue.destination as? InformationViewController{
+            if customTextSwitch.isOn{
+                informationViewController.informationText = customTextField.text
+            }
+        }
     }
-    */
 
+}
+
+extension HomeViewController: UITextViewDelegate{
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        let allowedCharacterSet = CharacterSet.alphanumerics.union(CharacterSet.whitespacesAndNewlines)
+        let maxCharacterCount = 150
+        let currentCharacters = textView.text.count
+        let finalCharacterCount = currentCharacters - range.length + text.count
+        return text == "" || CharacterSet(charactersIn: text).isSubset(of: allowedCharacterSet) && finalCharacterCount <= maxCharacterCount
+    }
 }
