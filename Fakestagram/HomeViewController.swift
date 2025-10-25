@@ -38,7 +38,9 @@ class HomeViewController: UIViewController {
         if customTextSwitch.isOn{
             if customTextField.text != "" {
                 //HomeInformationSegue
-                performSegue(withIdentifier: "HomeInformationSegue", sender: nil)
+                navigateToInformationViewController()
+                //De versión 1
+//                performSegue(withIdentifier: "HomeInformationSegue", sender: nil)
             }else{
                 let alertController = UIAlertController(title: nil, message: "Add custom text", preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: "OK", style: .cancel))
@@ -46,8 +48,19 @@ class HomeViewController: UIViewController {
             }
         }else{
             //Se ejecuta nuestro segue con texto default
-            performSegue(withIdentifier: "HomeInformationSegue", sender: nil)
+            //De version 1
+//            performSegue(withIdentifier: "HomeInformationSegue", sender: nil)
+            navigateToInformationViewController()
         }
+    }
+    
+    
+    private func navigateToInformationViewController(){
+        guard let infoViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "InformationViewController") as? InformationViewController else { return }
+        if customTextSwitch.isOn{
+            infoViewController.informationText = customTextField.text
+        }
+        present(infoViewController, animated: true)
     }
     
     @IBAction func imageTypeSwitchValueChanged(_ sender: UISwitch) {
@@ -58,6 +71,13 @@ class HomeViewController: UIViewController {
         customTextField.isEditable = sender.isOn
     }
     
+    @IBAction func picsButtonTapped(_ sender: UIButton){
+        guard let feedViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FeedViewController") as? FeedViewController else { return }
+        feedViewController.pictureType = imageType.isOn ? .dog : .cat
+        feedViewController.showCaption = captionSwitch.isOn
+        navigationController?.pushViewController(feedViewController, animated:  true)
+    }
+    
     
     // MARK: - Navigation
 
@@ -66,8 +86,7 @@ class HomeViewController: UIViewController {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
         if let feedViewController = segue.destination as? FeedViewController{
-            feedViewController.pictureType = imageType.isOn ? .dog : .cat
-            feedViewController.showCaption = captionSwitch.isOn
+
         }else if segue.identifier == "HomeInformationSegue",
                  let informationViewController = segue.destination as? InformationViewController{
             if customTextSwitch.isOn{
